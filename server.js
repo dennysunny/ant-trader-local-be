@@ -13,6 +13,9 @@ app.use(express.json());
 const API_SECRET = environment.SECRET_KEY;
 const AUTH_BASE_URL = environment.AUTH_BASE_URL;
 const TRADE_BASE_URL = environment.TRADE_BASE_URL;
+const CHART_BASE_URL = environment.CHART_BASE_URL;
+const CONTACT_MASTER_BASE_URL = environment.CONTACT_MASTER_BASE_URL;
+const OPTION_CHAIN_BASE_URL = environment.OPTION_CHAIN_BASE_URL;
 
 
 // API to create initial user session and handle the response
@@ -43,11 +46,32 @@ app.post('/api/auth/create-session', async (req, res) => {
 
 // Common Method to call api based on API Method, Endpoint and session info
 // It also accecpts params and data for requests
-const callAliceApi = async (method, endpoint, session, { data = null, params = null } = {}) => {
+const callAliceApi = async (method, endpoint, session, { data = null, params = null } = {}, isChart = false, isContactMaster = false, isOptionChain = false) => {
+    let baseUrl = TRADE_BASE_URL;
+
+    if (isChart) {
+        baseUrl = CHART_BASE_URL
+    } else if (isContactMaster) {
+        baseUrl = CONTACT_MASTER_BASE_URL;
+    } else if (isOptionChain) {
+        baseUrl = OPTION_CHAIN_BASE_URL;
+    }
+
+    console.log('payload', {
+            method,
+            url: `${baseUrl}${endpoint}`,
+            headers: {
+                Authorization: `Bearer ${session}`,
+                'Content-Type': 'application/json'
+            },
+            data,
+            timeout: 10000
+        })
+
     try {
         return await axios({
             method,
-            url: `${TRADE_BASE_URL}${endpoint}`,
+            url: `${baseUrl}${endpoint}`,
             headers: {
                 Authorization: `Bearer ${session}`,
                 'Content-Type': 'application/json'
@@ -64,15 +88,20 @@ const callAliceApi = async (method, endpoint, session, { data = null, params = n
 
 // Common API to return data from aliceblue API
 app.post('/api/shell', async (req, res) => {
-    const { method, endpoint, session, data = null, params = null } = req.body;
+    const { method, endpoint, session, data = null, params = null, isChart = false, isContactMaster = false, isOptionChain = false } = req.body;
 
     try {
         const response = await callAliceApi(
             method,
             endpoint,
             session,
-            { data, params }
+            { data, params },
+            isChart,
+            isContactMaster,
+            isOptionChain
         );
+
+        //console.log('response', response.data)
 
         res.json({
             success: response.data.status,
