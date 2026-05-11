@@ -8,7 +8,15 @@ const { default: axios } = require("axios");
 const { API_ENDPOINTS } = require("./ant-api-endpoints");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:4200',
+        'https://alice-blue-trader-frontend.vercel.app'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
+app.options('*', cors());
 app.use(express.json());
 
 // const API_SECRET = environment.SECRET_KEY;
