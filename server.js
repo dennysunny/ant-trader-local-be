@@ -31,6 +31,7 @@ const TRADE_BASE_URL = process.env.TRADE_BASE_URL;
 const CHART_BASE_URL = process.env.CHART_BASE_URL;
 const CONTACT_MASTER_BASE_URL = process.env.CONTACT_MASTER_BASE_URL;
 const OPTION_CHAIN_BASE_URL = process.env.OPTION_CHAIN_BASE_URL;
+const WS_BASE_URL = process.env.WS_BASE_URL;
 const PORT = process.env.PORT || 3000;
 
 // API to create initial user session and handle the response
@@ -68,6 +69,7 @@ const callAliceApi = async (
     isChart = false,
     isContactMaster = false,
     isOptionChain = false,
+    isWs = false,
 ) => {
     let baseUrl = TRADE_BASE_URL;
 
@@ -77,6 +79,8 @@ const callAliceApi = async (
         baseUrl = CONTACT_MASTER_BASE_URL;
     } else if (isOptionChain) {
         baseUrl = OPTION_CHAIN_BASE_URL;
+    } else if (isWs) {
+        baseUrl = WS_BASE_URL;
     }
 
     console.log("payload", {
@@ -119,6 +123,7 @@ app.post("/api/shell", async (req, res) => {
         isChart = false,
         isContactMaster = false,
         isOptionChain = false,
+        isWs = false,
     } = req.body;
 
     try {
@@ -130,6 +135,7 @@ app.post("/api/shell", async (req, res) => {
             isChart,
             isContactMaster,
             isOptionChain,
+            isWs,
         );
 
         //console.log('response', response.data)
